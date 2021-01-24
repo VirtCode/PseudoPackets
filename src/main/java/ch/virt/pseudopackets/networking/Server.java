@@ -1,10 +1,13 @@
 package ch.virt.pseudopackets.networking;
 
-import ch.virt.bruhgame.networking.packeting.PacketEncoder;
-import ch.virt.bruhgame.networking.packeting.Protocol;
+import ch.virt.pseudopackets.handlers.ServerPacketHandler;
+import ch.virt.pseudopackets.packets.PacketEncoder;
+import ch.virt.pseudopackets.packets.Protocol;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.*;
 
 /**
  * @author VirtCode
@@ -12,21 +15,19 @@ import java.net.ServerSocket;
  */
 public class Server extends Thread{
 
-    public static void main(String[] args) {
-        new Server(1234);
-    }
-
     private ServerSocket socket;
+    private HashMap<UUID, ClientWrapper> acceptedClients;
 
     private PacketEncoder encoder;
-    private Protocol protocol;
+    private ServerPacketHandler handler;
 
     private boolean running;
     private int port;
 
-    public Server(int port){
-        protocol = new Protocol();
+    public Server(Protocol protocol, ServerPacketHandler packets, int port){
         encoder = new PacketEncoder(protocol);
+        this.handler = packets;
+        this.acceptedClients = new HashMap<>();
 
         running = true;
         this.port = port;
@@ -42,14 +43,30 @@ public class Server extends Thread{
             e.printStackTrace();
         }
 
-        System.out.println("Server Started!");
-
         while (running){
             try {
-                new ClientWrapper(socket.accept(), encoder).start();
+                acceptClient(socket.accept());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void close() throws IOException {
+        running = false;
+        List<UUID> list = new ArrayList<>(acceptedClients.keySet());
+        for (UUID uuid : list) {
+            acceptedClients.get(uuid).disconnect();
+        }
+    }
+
+    public void acceptClient(Socket socket){
+        ClientWrapper wrapper = new ClientWrapper(socket, UUID.randomUUID(), encoder, handler, this::disconnectedClient);
+        acceptedClients.put(wrapper.getUuid(), wrapper);
+        wrapper.start();
+    }
+
+    private void disconnectedClient(UUID uuid){
+        acceptedClients.remove(uuid);
     }
 }

@@ -18,15 +18,21 @@ public class ClientWrapper extends Thread {
     private final UUID id;
     private final PacketEncoder encoder;
     private final ServerPacketHandler receiver;
+    private final ClientDisconnectedEvent disconnectRemover;
 
     private PrintWriter writer;
     private BufferedReader reader;
 
-    public ClientWrapper(Socket socket, UUID id, PacketEncoder encoder, ServerPacketHandler receiver) {
+    public ClientWrapper(Socket socket, UUID id, PacketEncoder encoder, ServerPacketHandler receiver, ClientDisconnectedEvent disconnectRemover) {
         this.socket = socket;
         this.id = id;
         this.encoder = encoder;
         this.receiver = receiver;
+        this.disconnectRemover = disconnectRemover;
+    }
+
+    public UUID getUuid() {
+        return id;
     }
 
     @Override
@@ -48,11 +54,10 @@ public class ClientWrapper extends Thread {
 
                 } catch (InvalidPacketException e) {
                     System.err.println("Failed to read Packet!");
-                } catch (IOException ignored){ }
+                } catch (IOException ignored){ break; }
             }
 
-            receiver.disconnected(id);
-            socket.close();
+            disconnect();
         } catch (IOException e) {
             System.err.println("Failed to connect with Client!");
         }
@@ -61,6 +66,7 @@ public class ClientWrapper extends Thread {
     public void disconnect() throws IOException {
         receiver.disconnected(id);
         socket.close();
+        disconnectRemover.disconnected(id);
     }
 
     public void sendPacket(Packet packet){

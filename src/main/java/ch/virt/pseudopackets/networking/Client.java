@@ -40,22 +40,33 @@ public class Client extends Thread {
 
     @Override
     public void run() {
-        while (socket.isConnected()) {
-            try {
-                String s = reader.readLine();
-                if (s == null || s.equals("")) continue;
+        try {
+            handler.connected();
+            while (socket.isConnected()) {
+                try {
+                    String s = reader.readLine();
+                    if (s == null || s.equals("")) continue;
 
-                Packet packet = encoder.decode(s);
+                    Packet packet = encoder.decode(s);
 
-                handler.handle(packet);
+                    handler.handle(packet);
 
-            } catch (InvalidPacketException e) {
-                System.err.println("Failed to read Packet!");
-            } catch (IOException ignored){ }
+                } catch (InvalidPacketException e) {
+                    System.err.println("Failed to read Packet!");
+                } catch (IOException ignored) {
+                    break;
+                }
+            }
+
+            close();
+        } catch (IOException e){
+            System.err.println("Failed to connect with Server!");
         }
+
     }
 
     public void close() throws IOException {
+        handler.disconnected();
         socket.close();
     }
 
