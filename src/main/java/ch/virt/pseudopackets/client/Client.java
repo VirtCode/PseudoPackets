@@ -1,4 +1,4 @@
-package ch.virt.pseudopackets.networking;
+package ch.virt.pseudopackets.client;
 
 import ch.virt.pseudopackets.exceptions.InvalidPacketException;
 import ch.virt.pseudopackets.handlers.ClientPacketHandler;
@@ -41,11 +41,12 @@ public class Client extends Thread {
     @Override
     public void run() {
         try {
-            handler.connected();
-            while (socket.isConnected()) {
+            if(socket.isConnected()) handler.connected();
+            while (!socket.isClosed()) {
                 try {
                     String s = reader.readLine();
-                    if (s == null || s.equals("")) continue;
+                    if (s == null) break;
+                    if (s.equals("")) continue;
 
                     Packet packet = encoder.decode(s);
 

@@ -1,6 +1,7 @@
-package ch.virt.pseudopackets.networking;
+package ch.virt.pseudopackets.server;
 
 import ch.virt.pseudopackets.handlers.ServerPacketHandler;
+import ch.virt.pseudopackets.packets.Packet;
 import ch.virt.pseudopackets.packets.PacketEncoder;
 import ch.virt.pseudopackets.packets.Protocol;
 
@@ -66,7 +67,15 @@ public class Server extends Thread{
         wrapper.start();
     }
 
+    public void disconnectClient(UUID uuid) throws IOException {
+        acceptedClients.get(uuid).disconnect();
+    }
+
     private void disconnectedClient(UUID uuid){
         acceptedClients.remove(uuid);
+    }
+
+    public void sendPacket(Packet packet, UUID uuid){
+        acceptedClients.get(uuid).sendPacket(packet);
     }
 }

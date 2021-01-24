@@ -1,4 +1,4 @@
-package ch.virt.pseudopackets.networking;
+package ch.virt.pseudopackets.server;
 
 import ch.virt.pseudopackets.exceptions.InvalidPacketException;
 import ch.virt.pseudopackets.handlers.ServerPacketHandler;
@@ -23,6 +23,8 @@ public class ClientWrapper extends Thread {
     private PrintWriter writer;
     private BufferedReader reader;
 
+    private boolean disconnected;
+
     public ClientWrapper(Socket socket, UUID id, PacketEncoder encoder, ServerPacketHandler receiver, ClientDisconnectedEvent disconnectRemover) {
         this.socket = socket;
         this.id = id;
@@ -37,6 +39,7 @@ public class ClientWrapper extends Thread {
 
     @Override
     public void run() {
+        disconnected = false;
         try {
             writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -46,7 +49,8 @@ public class ClientWrapper extends Thread {
             while (socket.isConnected()) {
                 try {
                     String s = reader.readLine();
-                    if (s == null || s.equals("")) continue;
+                    if (s == null) break;
+                    if (s.equals("")) continue;
 
                     Packet packet = encoder.decode(s);
 
@@ -57,7 +61,7 @@ public class ClientWrapper extends Thread {
                 } catch (IOException ignored){ break; }
             }
 
-            disconnect();
+            if(!disconnected) disconnect();
         } catch (IOException e) {
             System.err.println("Failed to connect with Client!");
         }
@@ -67,6 +71,7 @@ public class ClientWrapper extends Thread {
         receiver.disconnected(id);
         socket.close();
         disconnectRemover.disconnected(id);
+        disconnected = true;
     }
 
     public void sendPacket(Packet packet){

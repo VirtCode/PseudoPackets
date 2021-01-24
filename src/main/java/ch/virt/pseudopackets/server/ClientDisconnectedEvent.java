@@ -1,4 +1,4 @@
-package ch.virt.pseudopackets.networking;
+package ch.virt.pseudopackets.server;
 
 import java.util.UUID;
 
