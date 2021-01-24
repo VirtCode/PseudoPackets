@@ -1,4 +1,4 @@
-package ch.virt.pseudopackets.networking.packeting;
+package ch.virt.pseudopackets.packets;
 
 import ch.virt.pseudopackets.exceptions.InvalidPacketException;
 import com.google.gson.Gson;

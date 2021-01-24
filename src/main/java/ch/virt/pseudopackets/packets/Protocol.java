@@ -1,4 +1,4 @@
-package ch.virt.pseudopackets.networking.packeting;
+package ch.virt.pseudopackets.packets;
 
 import java.util.HashMap;
 import java.util.Map;

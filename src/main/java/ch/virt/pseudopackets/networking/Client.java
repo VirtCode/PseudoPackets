@@ -2,9 +2,9 @@ package ch.virt.pseudopackets.networking;
 
 import ch.virt.pseudopackets.exceptions.InvalidPacketException;
 import ch.virt.pseudopackets.handlers.ClientPacketHandler;
-import ch.virt.pseudopackets.networking.packeting.Packet;
-import ch.virt.pseudopackets.networking.packeting.PacketEncoder;
-import ch.virt.pseudopackets.networking.packeting.Protocol;
+import ch.virt.pseudopackets.packets.Packet;
+import ch.virt.pseudopackets.packets.PacketEncoder;
+import ch.virt.pseudopackets.packets.Protocol;
 
 import java.io.*;
 import java.net.Socket;

@@ -1,6 +1,6 @@
 package ch.virt.pseudopackets.handlers;
 
-import ch.virt.pseudopackets.networking.packeting.Packet;
+import ch.virt.pseudopackets.packets.Packet;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
