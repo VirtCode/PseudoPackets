@@ -22,7 +22,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.VirtCode:StringGenerator:[Version]'
+    compile 'com.github.VirtCode:PseudoPackets:[Version]'
 }
 ```
 Or you could download a built Jar in the release section.
